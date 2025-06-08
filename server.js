@@ -10,6 +10,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Setup file storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = './uploads';
@@ -23,6 +24,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// SendGrid transporter
 const transporter = nodemailer.createTransport({
   service: 'SendGrid',
   auth: {
@@ -31,6 +33,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Accept multiple uploads for 6 months + ID front/back
 const uploadFields = [
   { name: 'bank_statement_jan' },
   { name: 'bank_statement_feb' },
@@ -42,6 +45,7 @@ const uploadFields = [
   { name: 'id_back' }
 ];
 
+// Main POST handler
 app.post('/submit', upload.fields(uploadFields), async (req, res) => {
   try {
     const data = req.body;
@@ -49,8 +53,7 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
 
     let text = '';
     for (let key in data) {
-      text += `${key}: ${data[key]}
-`;
+      text += `${key}: ${data[key]}\n`;
     }
 
     const attachments = [];
@@ -63,6 +66,7 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
       });
     }
 
+    // Email to admin
     await transporter.sendMail({
       from: 'info@perkstreetfinancial.com',
       to: 'info@perkstreetfinancial.com',
@@ -71,6 +75,7 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
       attachments
     });
 
+    // Confirmation email to applicant
     if (data.email && data.email.includes('@')) {
       await transporter.sendMail({
         from: 'info@perkstreetfinancial.com',
@@ -81,11 +86,13 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
     }
 
     res.send("<h2 style='font-family: Inter, sans-serif;'>You're all set!<br>We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h2>");
+  } catch (error) {
     console.error("Error submitting form:", error);
-    res.status(500).send('<h3>There was a problem processing your application. Please try again later or contact support.</h3>');
+    res.status(500).send("<h3>There was a problem processing your application. Please try again later or contact support.</h3>");
   }
 });
 
+// Start the server
 app.listen(3000, () => {
   console.log('Server running on port 3000');
 });
