@@ -80,8 +80,7 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
       });
     }
 
-    res.send('<h2 style="font-family: Inter, sans-serif;">You're all set!<br>We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h2>');
-  } catch (error) {
+    res.send("<h2 style='font-family: Inter, sans-serif;'>You're all set!<br>We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h2>");
     console.error("Error submitting form:", error);
     res.status(500).send('<h3>There was a problem processing your application. Please try again later or contact support.</h3>');
   }
