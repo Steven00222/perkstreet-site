@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PerkStreet Financial</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 40px;
+      text-align: center;
+    }
+    header {
+      background-color: #ffffff;
+      padding: 20px 0;
+      margin-bottom: 30px;
+    }
+    img.logo {
+      height: 60px;
+    }
+    form {
+      background: #ffffff;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #2b2e4a;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e2037;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://sunrisehealth.icu/sunrise_logo.png" alt="PerkStreet Logo" class="logo"/>
+    <h1>Welcome to PerkStreet Financial</h1>
+    <p>Submit your inquiry below</p>
+  </header>
+
+  <form action="https://perkstreet-site-6yb6.onrender.com/submit" method="POST">
+    <input type="text" name="name" placeholder="Full Name" required />
+    <input type="email" name="email" placeholder="Email Address" required />
+    <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+    <button type="submit">Send</button>
+  </form>
+</body>
+</html>
