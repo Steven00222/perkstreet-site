@@ -10,21 +10,20 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Setup file storage
+// File upload config
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
+  destination: (req, file, cb) => {
     const dir = './uploads';
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
     cb(null, dir);
   },
-  filename: function (req, file, cb) {
+  filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
   }
 });
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-// SendGrid transporter
 const transporter = nodemailer.createTransport({
   service: 'SendGrid',
   auth: {
@@ -33,7 +32,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Accept multiple uploads for 6 months + ID front/back
+// Expected upload fields
 const uploadFields = [
   { name: 'bank_statement_jan' },
   { name: 'bank_statement_feb' },
@@ -45,11 +44,14 @@ const uploadFields = [
   { name: 'id_back' }
 ];
 
-// Main POST handler
 app.post('/submit', upload.fields(uploadFields), async (req, res) => {
   try {
     const data = req.body;
     const files = req.files;
+
+    console.log("✅ Form received:");
+    console.log("Text fields:", data);
+    console.log("Files received:", Object.keys(files));
 
     let text = '';
     for (let key in data) {
@@ -83,16 +85,17 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
         subject: 'Application Received – PerkStreet Financial',
         text: "You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox."
       });
+    } else {
+      console.warn("⚠️ No valid applicant email found, skipping confirmation email.");
     }
 
     res.send("<h2 style='font-family: Inter, sans-serif;'>You're all set!<br>We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h2>");
   } catch (error) {
-    console.error("Error submitting form:", error);
+    console.error("❌ Error submitting form:", error);
     res.status(500).send("<h3>There was a problem processing your application. Please try again later or contact support.</h3>");
   }
 });
 
-// Start the server
 app.listen(3000, () => {
-  console.log('Server running on port 3000');
+  console.log('🚀 Server running on port 3000');
 });
