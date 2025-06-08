@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Multer setup for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const dir = './uploads';
@@ -24,16 +23,14 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// SendGrid or SMTP transport setup
 const transporter = nodemailer.createTransport({
-  service: 'SendGrid', // You can use another SMTP if preferred
+  service: 'SendGrid',
   auth: {
     user: 'apikey',
     pass: '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'
   }
 });
 
-// Accept all files and form fields
 const uploadFields = [
   { name: 'bank_statement_jan' },
   { name: 'bank_statement_feb' },
@@ -66,6 +63,7 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
       });
     }
 
+    // Email to admin
     await transporter.sendMail({
       from: 'info@perkstreetfinancial.com',
       to: 'info@perkstreetfinancial.com',
@@ -74,7 +72,15 @@ app.post('/submit', upload.fields(uploadFields), async (req, res) => {
       attachments
     });
 
-    res.status(200).send('Application submitted successfully');
+    // Auto-reply to applicant
+    await transporter.sendMail({
+      from: 'info@perkstreetfinancial.com',
+      to: data.email,
+      subject: 'Application Received – PerkStreet Financial',
+      text: "You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox."
+    });
+
+    res.send('<h2 style="font-family: Inter, sans-serif;">You're all set!<br>We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h2>');
   } catch (error) {
     console.error(error);
     res.status(500).send('Error processing application');
