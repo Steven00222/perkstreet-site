@@ -1,125 +1,93 @@
+require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
 const multer = require('multer');
-const path = require('path');
+const nodemailer = require('nodemailer');
 const fs = require('fs');
-const dotenv = require('dotenv');
-const sgMail = require('@sendgrid/mail');
+const path = require('path');
+const cors = require('cors');
 
-dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// Middleware
+app.use(cors());
+app.use(express.static('frontend'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-// Multer setup
+// Set up storage for multer
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage }).fields([
+  { name: 'statement_jan' },
+  { name: 'statement_feb' },
+  { name: 'statement_mar' },
+  { name: 'statement_apr' },
+  { name: 'statement_may' },
+  { name: 'statement_jun' },
+  { name: 'front_id' },
+  { name: 'back_id' }
+]);
 
-// Serve static files (index.html)
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-// Handle form submission
-app.post('/submit', upload.fields([
-  { name: 'statements', maxCount: 10 },
-  { name: 'idFront', maxCount: 1 },
-  { name: 'idBack', maxCount: 1 }
-]), async (req, res) => {
+// Route to handle form submission
+app.post('/submit', upload, async (req, res) => {
   try {
     const {
-      businessName,
-      businessEmail,
-      personalEmail,
-      phone,
-      dob,
-      ssn,
-      ein,
-      position,
-      annualRevenue,
-      businessAddress,
-      homeAddress,
-      website
+      ssn, dob, phone, email, businessName,
+      businessAddress, homeAddress, ein, businessPhone,
+      businessWebsite, businessEmail, annualRevenue, position
     } = req.body;
 
-    const attachments = [];
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.SENDER_PASSWORD
+      }
+    });
 
-    // Handle bank statements
-    if (req.files['statements']) {
-      req.files['statements'].forEach(file => {
+    const attachments = [];
+    const files = req.files || {};
+    for (const key in files) {
+      files[key].forEach(file => {
         attachments.push({
-          content: file.buffer.toString('base64'),
           filename: file.originalname,
-          type: file.mimetype,
-          disposition: 'attachment',
+          content: file.buffer
         });
       });
     }
 
-    // Handle ID front
-    if (req.files['idFront']?.[0]) {
-      attachments.push({
-        content: req.files['idFront'][0].buffer.toString('base64'),
-        filename: req.files['idFront'][0].originalname,
-        type: req.files['idFront'][0].mimetype,
-        disposition: 'attachment',
-      });
-    }
-
-    // Handle ID back
-    if (req.files['idBack']?.[0]) {
-      attachments.push({
-        content: req.files['idBack'][0].buffer.toString('base64'),
-        filename: req.files['idBack'][0].originalname,
-        type: req.files['idBack'][0].mimetype,
-        disposition: 'attachment',
-      });
-    }
-
-    // Compose email
-    const emailBody = `
-      <h2>New Application Submission</h2>
-      <p><strong>Business Name:</strong> ${businessName}</p>
-      <p><strong>Business Email:</strong> ${businessEmail}</p>
-      <p><strong>Personal Email:</strong> ${personalEmail}</p>
-      <p><strong>Phone:</strong> ${phone}</p>
-      <p><strong>DOB:</strong> ${dob}</p>
-      <p><strong>SSN / Tax ID:</strong> ${ssn}</p>
-      <p><strong>EIN / Tax ID (Business):</strong> ${ein}</p>
-      <p><strong>Position:</strong> ${position}</p>
-      <p><strong>Annual Revenue:</strong> ${annualRevenue}</p>
-      <p><strong>Business Address:</strong> ${businessAddress}</p>
-      <p><strong>Home Address:</strong> ${homeAddress}</p>
-      <p><strong>Business Website:</strong> ${website}</p>
-    `;
-
-    const msg = {
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
       to: process.env.RECEIVER_EMAIL,
-      from: process.env.RECEIVER_EMAIL,
-      subject: 'New PerkStreet Application',
-      html: emailBody,
-      attachments: attachments,
+      subject: 'New Application Submission - PerkStreet',
+      text: `
+New Application Received:
+
+SSN: ${ssn}
+DOB: ${dob}
+Phone: ${phone}
+Email: ${email}
+Business Name: ${businessName}
+Business Address: ${businessAddress}
+Home Address: ${homeAddress}
+EIN/Tax ID: ${ein}
+Business Phone: ${businessPhone}
+Business Website: ${businessWebsite}
+Business Email: ${businessEmail}
+Annual Revenue: ${annualRevenue}
+Position: ${position}
+      `,
+      attachments: attachments
     };
 
-    await sgMail.send(msg);
-
-    // Confirmation back to user
-    res.send(`
-      <h2 style="font-family: Inter, sans-serif;">
-        You're all set!<br>
-        We've received the application. Our team will review the information and get back to you within two business days.
-        Keep an eye on your inbox.
-      </h2>
-    `);
+    await transporter.sendMail(mailOptions);
+    res.send('<h3 style="font-family:sans-serif;color:green;">â You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h3>');
   } catch (error) {
-    console.error('❌ Error submitting form:', error.message || error);
-    res.status(500).send('<h3>There was a problem processing your application. Please try again later or contact support.</h3>');
+    console.error('â Error submitting form:', error);
+    res.status(500).send('<h3 style="font-family:sans-serif;color:red;">There was a problem processing your application. Please try again later or contact support.</h3>');
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
