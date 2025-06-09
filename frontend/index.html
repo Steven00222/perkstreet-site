@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PerkStreet Financial - Application</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1, h2 {
+      color: #111;
+    }
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    input[type="file"] {
+      border: none;
+    }
+    button {
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      margin-top: 25px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Apply Now</h1>
+  <form action="/submit" method="POST" enctype="multipart/form-data">
+    <h2>Personal & Business Information</h2>
+    <label for="businessName">Business Name</label>
+    <input type="text" name="businessName" required />
+
+    <label for="businessEmail">Business Email</label>
+    <input type="email" name="businessEmail" required />
+
+    <label for="personalEmail">Personal Email</label>
+    <input type="email" name="personalEmail" required />
+
+    <label for="phone">Phone Number</label>
+    <input type="tel" name="phone" required placeholder="+1 or international format" />
+
+    <label for="dob">Date of Birth</label>
+    <input type="date" name="dob" required />
+
+    <label for="ssn">Social Security Number / Tax ID</label>
+    <input type="text" name="ssn" required />
+
+    <label for="ein">EIN / Tax ID (Business)</label>
+    <input type="text" name="ein" required />
+
+    <label for="position">Your Position</label>
+    <input type="text" name="position" required />
+
+    <label for="annualRevenue">Annual Revenue</label>
+    <input type="text" name="annualRevenue" required />
+
+    <label for="businessAddress">Business Address (US, Canada, UK, AUS Format)</label>
+    <input type="text" name="businessAddress" required />
+
+    <label for="homeAddress">Home Address (US, Canada, UK, AUS Format)</label>
+    <input type="text" name="homeAddress" required />
+
+    <label for="website">Business Website</label>
+    <input type="url" name="website" required />
+
+    <h2>Upload Documents</h2>
+    <label>Upload 6 Months of Business Bank Statements</label>
+    <input type="file" name="statements" multiple required />
+
+    <label>Upload Clear ID - Front</label>
+    <input type="file" name="idFront" required />
+
+    <label>Upload Clear ID - Back</label>
+    <input type="file" name="idBack" required />
+
+    <button type="submit">Submit Application</button>
+  </form>
+</body>
+</html>
