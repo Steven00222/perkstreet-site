@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0f06ddf (Update: revised server.js and index.html for 6 statement fields and improved layout)
 require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
@@ -81,9 +85,15 @@ Position: ${position}
     };
 
     await transporter.sendMail(mailOptions);
+<<<<<<< HEAD
     res.send('<h3 style="font-family:sans-serif;color:green;">â You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h3>');
   } catch (error) {
     console.error('â Error submitting form:', error);
+=======
+    res.send('<h3 style="font-family:sans-serif;color:green;">✅ You're all set! We've received the application. Our team will review the information and get back to you within two business days. Keep an eye on your inbox.</h3>');
+  } catch (error) {
+    console.error('❌ Error submitting form:', error);
+>>>>>>> 0f06ddf (Update: revised server.js and index.html for 6 statement fields and improved layout)
     res.status(500).send('<h3 style="font-family:sans-serif;color:red;">There was a problem processing your application. Please try again later or contact support.</h3>');
   }
 });
