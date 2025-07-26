@@ -119,7 +119,14 @@ app.post(
   }
 );
 const path = require('path');
+
+// Serve static frontend (assuming index.html is in backend/public)
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Fallback for single-page apps
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 app.listen(PORT, () => {
   console.log(`🚀 Server listening on port ${PORT}`);
 });
